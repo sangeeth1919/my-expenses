@@ -14,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+     # Step 5: Install Firebase CLI
+    - name: Install Firebase CLI one
+      run: npm install -g firebase-tools
+
+    # Step 6: Authenticate with Firebase
+    - name: Authenticate with Firebase two
+      run: firebase use monthly-expanses-e919c
+      env:
+        FIREBASE_TOKEN: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     # Step 1: Check out the code
     - name: Checkout code
       uses: actions/checkout@v2
@@ -40,8 +49,8 @@ jobs:
     - name: Authenticate with Firebase
       run: firebase use monthly-expanses-e919c
       env:
-        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        FIREBASE_TOKEN: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     # Step 7: Deploy to Firebase Hosting
     - name: Deploy to Firebase Hosting
-      run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+      run: firebase deploy --only hosting --token ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
