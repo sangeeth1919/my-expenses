@@ -1,6 +1,7 @@
 name: Deploy React App to Firebase Hosting
 
 on:
+  workflow_dispatch: # Enables manual triggering from the GitHub Actions UI
   push:
     branches:
       - main  # Trigger on push to the main branch
@@ -21,7 +22,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-       node-version: '22.x'  # This will install the latest LTS version of Node.js
+        node-version: '22.x'  # This will install the latest LTS version of Node.js
 
     # Step 3: Install dependencies
     - name: Install dependencies
