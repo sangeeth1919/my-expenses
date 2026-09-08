@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toDateString } from "../lib/budget";
 
 function AddExpense({ categories, addManualExpense, savingExpense }) {
-  const navigate = useNavigate();
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(toDateString(new Date()));
   const [type, setType] = useState("Other");
