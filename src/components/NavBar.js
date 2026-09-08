@@ -43,6 +43,9 @@ function NavBar({ user, onLogout }) {
         <NavLink to="/add" onClick={closeMenu}>
           Add Expense
         </NavLink>
+        <NavLink to="/checklists" onClick={closeMenu}>
+          Checklists
+        </NavLink>
         <NavLink to="/admin" onClick={closeMenu}>
           Admin
         </NavLink>

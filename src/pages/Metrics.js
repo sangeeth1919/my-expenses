@@ -30,16 +30,21 @@ function Metrics({ expenses, categories }) {
   const [startDate, setStartDate] = useState(toDateString(firstDayOfMonth));
   const [endDate, setEndDate] = useState(toDateString(now));
   const [selectedType, setSelectedType] = useState("ALL");
+  const [excludedType, setExcludedType] = useState("NONE");
 
-  // 1. Filtered Expenses Calculation
+  // 1. Filtered Expenses Calculation (Supports 'Not Equal To' filtering)
   const filteredExpenses = useMemo(() => {
     return expenses.filter((exp) => {
+      const expType = exp.type || "Other";
       const matchDate = exp.date >= startDate && exp.date <= endDate;
       const matchType =
-        selectedType === "ALL" ? true : (exp.type || "Other") === selectedType;
-      return matchDate && matchType;
+        selectedType === "ALL" ? true : expType === selectedType;
+      const matchExcluded =
+        excludedType === "NONE" ? true : expType !== excludedType;
+
+      return matchDate && matchType && matchExcluded;
     });
-  }, [expenses, startDate, endDate, selectedType]);
+  }, [expenses, startDate, endDate, selectedType, excludedType]);
 
   // 2. Metrics Summaries
   const totalAmount = useMemo(() => {
@@ -143,6 +148,21 @@ function Metrics({ expenses, categories }) {
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.name}>
                   {cat.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Exclude Category
+            <select
+              value={excludedType}
+              onChange={(e) => setExcludedType(e.target.value)}
+            >
+              <option value="NONE">None (Show All)</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  Not {cat.name}
                 </option>
               ))}
             </select>

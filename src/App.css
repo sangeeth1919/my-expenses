@@ -357,7 +357,7 @@ button.link {
 
 .filter-group {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 16px;
 }
 
@@ -414,12 +414,19 @@ button.link {
   padding: 40px 0;
 }
 
-/* --- Tables --- */
+/* --- Tables & Table Card Containers --- */
+.table-card {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .expenses-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
   text-align: left;
+  min-width: 480px;
 }
 
 .expenses-table th {
@@ -435,6 +442,14 @@ button.link {
   padding: 12px;
   border-bottom: 1px solid var(--line);
   font-size: 0.92rem;
+}
+
+/* Prevent Date Column From Wrapping & Overlapping */
+.expenses-table th:first-child,
+.expenses-table td:first-child {
+  white-space: nowrap;
+  width: 110px;
+  max-width: 120px;
 }
 
 .expenses-table tr:last-child td {
@@ -561,5 +576,16 @@ button.link {
 
   .hero-compact {
     grid-template-columns: 1fr;
+  }
+
+  /* Compact Table Layout for Mobile Screens */
+  .expenses-table th,
+  .expenses-table td {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+
+  .expenses-table td:first-child {
+    font-size: 0.8rem;
   }
 }

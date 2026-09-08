@@ -29,6 +29,8 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import AddExpense from "./pages/AddExpense";
 import Metrics from "./pages/Metrics";
+import Checklists from "./pages/Checklists";
+import ChecklistDetail from "./pages/ChecklistDetail";
 import "./App.css";
 
 const emptyPreferences = {
@@ -64,6 +66,7 @@ function App() {
   const [draft, setDraft] = useState(emptyPreferences);
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [checklists, setChecklists] = useState([]);
 
   // Active Group States
   const [activeGroupId, setActiveGroupId] = useState(null);
@@ -178,6 +181,10 @@ function App() {
       collection(db, "users", activeGroupName, "categories"),
       orderBy("name", "asc")
     );
+    const checklistsQuery = query(
+      collection(db, "users", activeGroupName, "checklists"),
+      orderBy("createdAt", "desc")
+    );
 
     const unsubPrefs = onSnapshot(
       prefsRef,
@@ -226,11 +233,20 @@ function App() {
       (error) => !cancelled && setBootError(getFriendlyErrorMessage(error))
     );
 
+    const unsubChecklists = onSnapshot(
+      checklistsQuery,
+      (snapshot) => {
+        setChecklists(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      },
+      (error) => !cancelled && setBootError(getFriendlyErrorMessage(error))
+    );
+
     return () => {
       cancelled = true;
       unsubPrefs();
       unsubExpenses();
       unsubCategories();
+      unsubChecklists();
     };
   }, [user, activeGroupName]);
 
@@ -371,6 +387,40 @@ function App() {
     }
   }
 
+  // --- Checklist Actions ---
+  async function createChecklist(data) {
+    if (!activeGroupName) return;
+    try {
+      await addDoc(collection(db, "users", activeGroupName, "checklists"), {
+        ...data,
+        createdAt: serverTimestamp(),
+      });
+    } catch (error) {
+      setFormError(getFriendlyErrorMessage(error));
+    }
+  }
+
+  async function updateChecklist(id, updatedData) {
+    if (!activeGroupName) return;
+    try {
+      await updateDoc(
+        doc(db, "users", activeGroupName, "checklists", id),
+        updatedData
+      );
+    } catch (error) {
+      setFormError(getFriendlyErrorMessage(error));
+    }
+  }
+
+  async function removeChecklist(id) {
+    if (!activeGroupName) return;
+    try {
+      await deleteDoc(doc(db, "users", activeGroupName, "checklists", id));
+    } catch (error) {
+      setFormError(getFriendlyErrorMessage(error));
+    }
+  }
+
   if (!isFirebaseConfigured()) return <SetupBanner />;
 
   if (loadingAuth) {
@@ -475,6 +525,25 @@ function App() {
         <Route
           path="/metrics"
           element={<Metrics expenses={expenses} categories={categories} />}
+        />
+        <Route
+          path="/checklists"
+          element={
+            <Checklists
+              playlists={checklists}
+              createChecklist={createChecklist}
+              removeChecklist={removeChecklist}
+            />
+          }
+        />
+        <Route
+          path="/checklists/:id"
+          element={
+            <ChecklistDetail
+              playlists={checklists}
+              updateChecklist={updateChecklist}
+            />
+          }
         />
         <Route
           path="/admin"
