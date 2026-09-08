@@ -32,16 +32,40 @@ code {
   padding: 24px 20px 64px;
 }
 
+/* --- Mobile-Responsive Navigation Bar --- */
 .nav {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  padding: 6px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 8px 16px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 999px;
-  width: fit-content;
+  border-radius: 20px;
   box-shadow: var(--shadow);
+  position: relative;
+  z-index: 100;
+}
+
+.nav-brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+}
+
+.brand-logo {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .nav a {
@@ -50,6 +74,7 @@ code {
   font-weight: 700;
   padding: 8px 16px;
   border-radius: 999px;
+  transition: background 0.2s, color 0.2s;
 }
 
 .nav a.active {
@@ -57,6 +82,40 @@ code {
   color: #fff;
 }
 
+.logout-btn {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+
+.logout-btn:hover {
+  color: var(--over);
+}
+
+/* Hamburger Icon (Mobile Toggle) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger .bar {
+  height: 2px;
+  width: 100%;
+  background-color: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* --- Layout Components --- */
 .hero-compact {
   grid-template-columns: 1fr auto;
   align-items: end;
@@ -100,7 +159,8 @@ code {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: "Fraunces", Georgia, serif;
   margin: 4px 0;
 }
@@ -111,6 +171,10 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
+}
+
+h3 {
+  font-size: 1.1rem;
 }
 
 .hero,
@@ -170,13 +234,29 @@ h2 {
 }
 
 .form,
-.form label {
+.form label,
+.form-grid label {
   display: grid;
   gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .form {
   gap: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid label:nth-child(3),
+.form-grid label:nth-child(4),
+.form-grid button {
+  grid-column: span 2;
 }
 
 .row {
@@ -185,13 +265,45 @@ h2 {
   gap: 12px;
 }
 
-input {
+/* --- Input & Select Dropdown Styling --- */
+input,
+select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 12px 14px;
   font: inherit;
-  background: #fff;
+  color: var(--ink);
+  background-color: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d6b62' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(31, 111, 74, 0.15);
+}
+
+.inline-select {
+  width: auto;
+  padding: 6px 32px 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  background-position: right 8px center;
+  background-size: 12px;
 }
 
 button {
@@ -217,6 +329,119 @@ button.link {
   font-weight: 600;
 }
 
+/* --- Badges & Banners --- */
+.badge {
+  background: #e7f0e4;
+  color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.success-banner {
+  background: #e7f0e4;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* --- Metrics & Analytics Styles --- */
+.filters-card {
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.filter-group label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.kpi-value {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.2rem;
+  margin: 8px 0 0;
+  color: var(--accent);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-container {
+  width: 100%;
+  max-width: 320px;
+  max-height: 280px;
+  padding: 12px;
+}
+
+.no-data {
+  color: var(--muted);
+  font-style: italic;
+  padding: 40px 0;
+}
+
+/* --- Tables --- */
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.expenses-table th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.expenses-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+}
+
+.expenses-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* --- Lists --- */
 .list {
   list-style: none;
   padding: 0;
@@ -226,6 +451,7 @@ button.link {
 .list li {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
@@ -259,13 +485,74 @@ button.link {
   margin: 0 0 16px;
 }
 
-@media (max-width: 800px) {
+/* --- Mobile Responsiveness (< 768px) --- */
+@media (max-width: 768px) {
+  .page,
+  .setup {
+    padding: 16px 12px 48px;
+  }
+
+  /* Hamburger Navigation Menu */
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-brand {
+    width: 100%;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    gap: 8px;
+  }
+
+  .nav-links.is-open {
+    display: flex;
+  }
+
+  .nav a {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 4px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    border-radius: 0;
+  }
+
+  /* Mobile Grid Restructuring */
   .hero,
   .grid,
   .row,
-  .top {
+  .top,
+  .form-grid,
+  .filter-group,
+  .kpi-grid,
+  .charts-grid {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .form-grid label:nth-child(3),
+  .form-grid label:nth-child(4),
+  .form-grid button {
+    grid-column: span 1;
   }
 
   .hero-amount {

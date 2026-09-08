@@ -8,10 +8,14 @@ function Dashboard({
   setAmount,
   note,
   setNote,
+  type = "Other",
+  setType,
   savingExpense,
   addExpense,
   todaysList,
   removeExpense,
+  categories = [],
+  updateExpenseType,
 }) {
   return (
     <>
@@ -63,15 +67,28 @@ function Dashboard({
               />
             </label>
             <label>
-              Note
-              <input
-                type="text"
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder="Lunch"
-              />
+              Expense Type
+              <select
+                value={type}
+                onChange={(event) => setType && setType(event.target.value)}
+              >
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
+          <label>
+            Note
+            <input
+              type="text"
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Lunch"
+            />
+          </label>
           <button type="submit" disabled={savingExpense || !prefsReady}>
             {savingExpense ? "Saving…" : "Add expense"}
           </button>
@@ -90,13 +107,28 @@ function Dashboard({
                   <strong>{formatMoney(expense.amount)}</strong>
                   <span>{expense.note || "Expense"}</span>
                 </div>
-                <button
-                  type="button"
-                  className="link"
-                  onClick={() => removeExpense(expense.id)}
-                >
-                  Remove
-                </button>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <select
+                    className="inline-select"
+                    value={expense.type || "Other"}
+                    onChange={(e) => updateExpenseType && updateExpenseType(expense.id, e.target.value)}
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    className="link"
+                    onClick={() => removeExpense(expense.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

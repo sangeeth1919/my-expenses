@@ -138,3 +138,24 @@ export function formatMoney(value) {
     maximumFractionDigits: 2,
   });
 }
+
+
+/**
+ * Returns unique category names from list or available categories.
+ */
+export function getExpenseCategories(categories = []) {
+  const defaultList = ["Other"];
+  const names = categories.map((c) => c.name);
+  return Array.from(new Set([...defaultList, ...names]));
+}
+
+/**
+ * Groups expenses by category and returns totals for reporting.
+ */
+export function groupExpensesByCategory(expenses = []) {
+  return expenses.reduce((acc, expense) => {
+    const category = expense.type || "Other";
+    acc[category] = (acc[category] || 0) + Number(expense.amount);
+    return acc;
+  }, {});
+}

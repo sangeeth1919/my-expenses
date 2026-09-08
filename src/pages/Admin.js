@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatMoney } from "../lib/budget";
 
 function Admin({
@@ -10,24 +11,78 @@ function Admin({
   savePreferences,
   expenses,
   removeExpense,
+  categories = [],
+  addCategory,
+  removeCategory,
+  updateExpenseType,
+  // Group Management Props
+  activeGroupName,
+  activeGroupData,
+  memberEmail,
+  setMemberEmail,
+  addEmailToGroup,
 }) {
+  const [newCategory, setNewCategory] = useState("");
+
   const cycleExpenses = expenses.filter(
     (expense) =>
       expense.date >= budget.periodStart && expense.date <= budget.periodEnd
   );
+
+  async function handleAddCategory(e) {
+    e.preventDefault();
+    if (!newCategory.trim()) return;
+    await addCategory(newCategory);
+    setNewCategory("");
+  }
 
   return (
     <>
       <header className="top">
         <div>
           <p className="eyebrow">Admin</p>
-          <h1>Preferences</h1>
+          <h1>Preferences & Configuration</h1>
           <p className="period">
-            Configure the spend cycle and monthly amount.
+            Configure group members, spend cycle, monthly amount, and expense categories.
           </p>
         </div>
       </header>
 
+      {/* Active Group & Member Management */}
+      <section className="card">
+        <h2>Active Group: {activeGroupName || "me"}</h2>
+        <p className="hint">
+          Data path: <code>users/{activeGroupName || "me"}/...</code>
+        </p>
+
+        <form onSubmit={addEmailToGroup} className="form">
+          <div className="row">
+            <input
+              type="email"
+              placeholder="member@example.com"
+              value={memberEmail}
+              onChange={(e) => setMemberEmail(e.target.value)}
+              required
+            />
+            <button type="submit" disabled={!memberEmail.trim()}>
+              Add Member
+            </button>
+          </div>
+        </form>
+
+        <div style={{ marginTop: "16px" }}>
+          <strong>Group Members:</strong>
+          <ul className="list" style={{ marginTop: "8px" }}>
+            {activeGroupData?.members?.map((email, idx) => (
+              <li key={idx}>
+                <span>{email}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Monthly Cycle Setup */}
       <section className="card">
         <h2>Monthly cycle</h2>
         <form onSubmit={savePreferences} className="form">
@@ -97,6 +152,44 @@ function Admin({
         )}
       </section>
 
+      {/* Manage Expense Categories */}
+      <section className="card">
+        <h2>Expense Categories</h2>
+        <p className="hint">Add categories to organize your expenses.</p>
+        
+        <form onSubmit={handleAddCategory} className="form">
+          <div className="row">
+            <input
+              type="text"
+              placeholder="e.g. Groceries, Bills, Transport"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+            <button type="submit" disabled={!newCategory.trim()}>
+              Add Category
+            </button>
+          </div>
+        </form>
+
+        <ul className="list" style={{ marginTop: "16px" }}>
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <span>{cat.name}</span>
+              {cat.name.toLowerCase() !== "other" && (
+                <button
+                  type="button"
+                  className="link"
+                  onClick={() => removeCategory(cat.id)}
+                >
+                  Delete
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Cycle Summary */}
       <section className="hero">
         <div>
           <p className="label">Left this cycle</p>
@@ -124,6 +217,7 @@ function Admin({
         </dl>
       </section>
 
+      {/* Expense List with Inline Category Updates */}
       <section className="card">
         <h2>This cycle</h2>
         <p className="hint">
@@ -143,13 +237,28 @@ function Admin({
                     {expense.note ? ` · ${expense.note}` : ""}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  className="link"
-                  onClick={() => removeExpense(expense.id)}
-                >
-                  Remove
-                </button>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <select
+                    className="inline-select"
+                    value={expense.type || "Other"}
+                    onChange={(e) => updateExpenseType(expense.id, e.target.value)}
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    className="link"
+                    onClick={() => removeExpense(expense.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
