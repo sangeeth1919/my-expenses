@@ -1,114 +1,144 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 export default function ChecklistDetail({ playlists = [], updateChecklist }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const currentList = playlists.find((item) => item.id === id);
-
-  const [name, setName] = useState("");
   const [newItemText, setNewItemText] = useState("");
 
-  useEffect(() => {
-    if (currentList) {
-      setName(currentList.name);
-    }
-  }, [currentList]);
+  // Find the active checklist from state
+  const checklist = playlists.find((item) => item.id === id);
 
-  if (!currentList) {
+  if (!checklist) {
     return (
       <div className="card">
-        <p>Checklist not found.</p>
-        <button type="button" onClick={() => navigate("/checklists")}>Back to Lists</button>
+        <h2>Checklist Not Found</h2>
+        <button type="button" onClick={() => navigate("/checklists")}>
+          Back to Checklists
+        </button>
       </div>
     );
   }
 
-  const handleNameBlur = () => {
-    if (name.trim() && name !== currentList.name) {
-      updateChecklist(id, { ...currentList, name: name.trim() });
-    }
+  const items = checklist.items || [];
+
+  // Toggle item completed status
+  const handleToggleItem = async (itemId) => {
+    const updatedItems = items.map((item) =>
+      item.id === itemId ? { ...item, completed: !item.completed } : item
+    );
+    await updateChecklist(id, { items: updatedItems });
   };
 
-  const handleAddItem = (e) => {
+  // Add new item to the checklist
+  const handleAddItem = async (e) => {
     e.preventDefault();
     if (!newItemText.trim()) return;
 
-    const updatedItems = [
-      ...(currentList.items || []),
-      { id: Date.now().toString(), text: newItemText.trim(), completed: false },
-    ];
+    const newItem = {
+      id: Date.now().toString(),
+      text: newItemText.trim(),
+      completed: false,
+    };
 
-    updateChecklist(id, { ...currentList, items: updatedItems });
+    const updatedItems = [...items, newItem];
+    await updateChecklist(id, { items: updatedItems });
     setNewItemText("");
   };
 
-  const toggleItem = (itemId) => {
-    const updatedItems = currentList.items.map((item) =>
-      item.id === itemId ? { ...item, completed: !item.completed } : item
-    );
-    updateChecklist(id, { ...currentList, items: updatedItems });
+  // --- REMOVE CHECKLIST ITEM ---
+  const handleRemoveItem = async (itemId) => {
+    const updatedItems = items.filter((item) => item.id !== itemId);
+    await updateChecklist(id, { items: updatedItems });
   };
 
-  const isCompleted =
-    currentList.items?.length > 0 && currentList.items.every((i) => i.completed);
-
   return (
-    <div className="card-container">
-      <button
-        type="button"
-        className="link"
-        onClick={() => navigate("/checklists")}
-        style={{ marginBottom: "16px" }}
-      >
-        ← Back to Checklists
-      </button>
-
-      <section className="card">
-        <div style={{ marginBottom: "16px" }}>
-          <label className="hint">Editable Checklist Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={handleNameBlur}
-            style={{ fontSize: "1.4rem", fontWeight: "bold" }}
-          />
+    <div className="page">
+      <header className="top">
+        <div>
+          <button
+            type="button"
+            className="link"
+            onClick={() => navigate("/checklists")}
+            style={{ marginBottom: "8px", cursor: "pointer" }}
+          >
+            ← Back to Checklists
+          </button>
+          <h1>{checklist.name}</h1>
+          <p className="period">Date: {checklist.date}</p>
         </div>
+      </header>
 
-        {isCompleted && (
-          <div className="success-banner">
-            🎉 All items in this checklist are bought!
-          </div>
-        )}
-
-        <form onSubmit={handleAddItem} className="row" style={{ marginBottom: "20px" }}>
+      {/* Add New Item Form */}
+      <section className="card" style={{ marginBottom: "16px" }}>
+        <form onSubmit={handleAddItem} className="row">
           <input
             type="text"
-            placeholder="Add item to buy..."
+            placeholder="Add new checklist item..."
             value={newItemText}
             onChange={(e) => setNewItemText(e.target.value)}
           />
-          <button type="submit">Add Item</button>
+          <button type="submit" style={{ width: "auto" }}>
+            Add Item
+          </button>
         </form>
+      </section>
 
-        <ul className="list">
-          {currentList.items?.map((item) => (
-            <li key={item.id} style={{ opacity: item.completed ? 0.6 : 1 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={item.completed}
-                  onChange={() => toggleItem(item.id)}
-                  style={{ width: "20px", height: "20px" }}
-                />
-                <span style={{ textDecoration: item.completed ? "line-through" : "none" }}>
-                  {item.text}
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
+      {/* Checklist Items List */}
+      <section className="card">
+        <h3>Items ({items.filter((i) => i.completed).length}/{items.length})</h3>
+        {items.length === 0 ? (
+          <p className="empty">No items added yet.</p>
+        ) : (
+          <ul className="list">
+            {items.map((item) => (
+              <li
+                key={item.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    cursor: "pointer",
+                    flex: 1,
+                    textDecoration: item.completed ? "line-through" : "none",
+                    color: item.completed ? "var(--muted)" : "var(--ink)",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={item.completed}
+                    onChange={() => handleToggleItem(item.id)}
+                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                  />
+                  <span>{item.text}</span>
+                </label>
+
+                {/* Remove Item Button */}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(item.id)}
+                  className="link"
+                  style={{
+                    color: "var(--over)",
+                    cursor: "pointer",
+                    padding: "4px 8px",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

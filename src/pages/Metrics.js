@@ -216,21 +216,22 @@ function Metrics({ expenses, categories }) {
           <table className="expenses-table">
             <thead>
               <tr>
-                <th>Date</th>
                 <th>Category</th>
-                <th>Note</th>
                 <th>Amount</th>
+                <th>Note</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
               {filteredExpenses.map((exp) => (
                 <tr key={exp.id}>
-                  <td>{exp.date}</td>
+                  
                   <td>
                     <span className="badge">{exp.type || "Other"}</span>
                   </td>
-                  <td>{exp.note || "—"}</td>
                   <td>{formatMoney(exp.amount)}</td>
+                  <td>{exp.note || "—"}</td>
+                  <td>{exp.date}</td>
                 </tr>
               ))}
             </tbody>
